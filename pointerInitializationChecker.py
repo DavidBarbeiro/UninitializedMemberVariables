@@ -9,18 +9,19 @@ def readFile(fileName):
 
 def processHeader(fileName):
 	content = readFile(fileName)
-	checkForPointer(content,fileName)
-
-def processImplementation(match,fileName):
-	print match
-	file = readFile(fileName)
-	#checkForPointer(content,fileName)
-
-def checkForPointer(content,fileName):
 	print content
 	print "***************\n"
 	for match in re.findall("\w+ *\*.*;", content):
 		checkForPointerName(match,fileName)
+
+def processImplementation(match,fileName):
+	print match
+	fileName = fileName[:-2] + ".mm"
+	content = readFile(fileName)
+	p = re.compile("\w*init\w* *\{.*}",re.DOTALL)
+	matchList = p.findall(content)
+	print matchList
+
 
 def checkForPointerName(content,fileName):
 	print content
@@ -30,9 +31,9 @@ def checkForPointerName(content,fileName):
 
 
 def main():
-	os.chdir("src")
-	for file in glob.glob("*.h"):
-	    content = processHeader(file)
+	#os.chdir("src")
+	for filename in glob.glob("*.h"):
+	    content = processHeader(filename)
 
 
 
