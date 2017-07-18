@@ -39,7 +39,7 @@
     return count;
 }
 
-- (id)objectForKey:(id)key
+- (id)objectForKeyinit:(id)key
 {
     __block id value;
     dispatch_sync(_queue, ^{ value = [_backingStore objectForKey:key]; });

@@ -29,7 +29,8 @@ def processImplementation(pointerName,filename):
 			continue
 		print "process" + filename
 		content = removeComments(content)
-		p = re.compile(" *[-+]\s*\(\s*\w*\s*\)\s*\w*init\w*\s*{",re.DOTALL)
+		#p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*init\w*\s*{",re.DOTALL)
+		p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*init\w*\s*{",re.DOTALL)
 		for initMethod in p.findall(content):
 			print "yay"
 			print initMethod
