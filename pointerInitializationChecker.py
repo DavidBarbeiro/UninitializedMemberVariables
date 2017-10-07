@@ -13,13 +13,18 @@ def readFile(filename):
 		return -1
 
 def processHeader(filename):
+	print "Parsing " + filename
 	content = readFile(filename)
 	content = removeComments(content)
+	pointerDeclarationList = []
 	for match in re.findall("\w+ *\*.*;", content):
-		checkForPointerDeclaration(match,filename)
+		matchList = re.findall("\w+", match)
+		pointerDeclarationList.append(matchList[1])
+	print pointerDeclarationList
+	processImplementation(pointerDeclarationList,filename)
 
-def processImplementation(pointerName,filename):
-	implementationExtensions = [".mm",".cpp",".m"]
+def processImplementation(pointerDeclarationList,filename):
+	implementationExtensions = [".mm",".m"]
 	dotIndex = filename.index(".")
 	baseFilename = filename[:dotIndex]
 	for extension in implementationExtensions:
@@ -27,30 +32,34 @@ def processImplementation(pointerName,filename):
 		content = readFile(filename)
 		if content<0:
 			continue
-		print "process" + filename
 		content = removeComments(content)
-		#p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*init\w*\s*{",re.DOTALL)
-		p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*init\w*\s*{",re.DOTALL)
+		p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*init.*?{",re.DOTALL)
+		#p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*init\w*\s*:\s*\(\s*\w*\s*[*&]*\s*\)\s*{",re.DOTALL)
 		for initMethod in p.findall(content):
-			print "yay"
-			print initMethod
-			if pointerIsInitialized(initMethod,pointerName,filename):
-				return
-		
-	results.append([pointerName,filename])
+			pointerIsInitialized(content,initMethod,pointerDeclarationList,filename)
 
-def checkForPointerDeclaration(pointerName,filename):
-	print "checkForPointerDeclaration" + pointerName
-	matchList = re.findall("\w+", pointerName)
-	processImplementation(matchList[1],filename)
+	for pointer in pointerDeclarationList:
+		results.append([pointer,filename])
 
-def pointerIsInitialized(initMethod,pointerName,filename):
+def pointerIsInitialized(content,initMethod,pointerDeclarationList,filename):
+	index = content.find(initMethod)
+	index += len(initMethod)
+	initMethodBeginIndex = index
+	bracketStackCount = 1
+	while bracketStackCount != 0 :
+		if content[index] == '{':
+			bracketStackCount += 1
+		elif content[index] == '}':
+			bracketStackCount -= 1
+		index+=1
+	initMethod = content[initMethodBeginIndex:index]
+
 	lines = initMethod.splitlines()
 	for line in lines:
-		match = re.match("\s*" + pointerName + "\s*=",line)
-		if match is not None:
-			return True
-	return False
+		for pointerName in pointerDeclarationList:
+			match = re.match("\s*" + pointerName + "\s*=",line)
+			if match is not None:
+				pointerDeclarationList.remove(pointerName)
 
 def removeComments(string):
     string = re.sub(re.compile("/\*.*?\*/",re.DOTALL ) ,"" ,string) # remove all occurance streamed comments (/*COMMENT */) from string
@@ -81,11 +90,12 @@ def filterExtension(filename):
 		return filename[dotIndex+1:]
 
 def printResults():
+	print "\n------Printing results:------\n"
 	for result in results:
 		print "Uninitialized pointer " + result[0] + " in file " + result[1]
 
 def main():
-	print "\n\n\n\n\n"
+	print "\n------Started execution------\n"
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	paths = walklevel(dir_path)
 
