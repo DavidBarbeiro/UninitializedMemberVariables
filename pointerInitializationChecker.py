@@ -17,18 +17,20 @@ def processHeader(filename):
 	content = readFile(filename)
 	content = removeComments(content)
 	pointerDeclarationList = []
-	for match in re.findall("\w+ *\*.*;", content):
+	for match in re.findall("\n\s+\w+ *\*.*;", content):
 		matchList = re.findall("\w+", match)
-		pointerDeclarationList.append(matchList[1])
+		if len(matchList) > 1:
+			pointerDeclarationList.append(matchList[1])
 	print pointerDeclarationList
 	processImplementation(pointerDeclarationList,filename)
 
 def processImplementation(pointerDeclarationList,filename):
 	implementationExtensions = [".mm",".m"]
-	dotIndex = filename.index(".")
+	dotIndex = filename.rfind(".")
 	baseFilename = filename[:dotIndex]
 	for extension in implementationExtensions:
 		filename = baseFilename + extension
+		print "filename: " + filename
 		content = readFile(filename)
 		if content<0:
 			continue
@@ -46,7 +48,7 @@ def pointerIsInitialized(content,initMethod,pointerDeclarationList,filename):
 	index += len(initMethod)
 	initMethodBeginIndex = index
 	bracketStackCount = 1
-	while bracketStackCount != 0 :
+	while bracketStackCount != 0 and index < len(content):
 		if content[index] == '{':
 			bracketStackCount += 1
 		elif content[index] == '}':
@@ -85,7 +87,7 @@ def filterImplementationFiles(filename):
 		return filename
 
 def filterExtension(filename):
-	dotIndex = filename.index(".")
+	dotIndex = filename.rfind(".")
 	if(dotIndex>0):
 		return filename[dotIndex+1:]
 
