@@ -30,23 +30,20 @@ def processImplementation(pointerDeclarationList,filename):
 	baseFilename = filename[:dotIndex]
 	for extension in implementationExtensions:
 		filename = baseFilename + extension
-		print "filename: " + filename
 		content = readFile(filename)
 		if content<0:
 			continue
 		content = removeComments(content)
-		p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*init.*?{",re.DOTALL)
-		#p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*init\w*\s*:\s*\(\s*\w*\s*[*&]*\s*\)\s*{",re.DOTALL)
+		p = re.compile(" *[-+]\s*\(\s*\w*\s*[*&]*\s*\)\s*\w*(?:init|setup).*?{",re.DOTALL)
 		for initMethod in p.findall(content):
 			pointerIsInitialized(content,initMethod,pointerDeclarationList,filename)
-
 	for pointer in pointerDeclarationList:
 		results.append([pointer,filename])
 
 def pointerIsInitialized(content,initMethod,pointerDeclarationList,filename):
 	index = content.find(initMethod)
-	index += len(initMethod)
-	initMethodBeginIndex = index
+	index += len(initMethod) + 1
+	initMethodBeginIndex = index-1
 	bracketStackCount = 1
 	while bracketStackCount != 0 and index < len(content):
 		if content[index] == '{':
@@ -55,7 +52,6 @@ def pointerIsInitialized(content,initMethod,pointerDeclarationList,filename):
 			bracketStackCount -= 1
 		index+=1
 	initMethod = content[initMethodBeginIndex:index]
-
 	lines = initMethod.splitlines()
 	for line in lines:
 		for pointerName in pointerDeclarationList:

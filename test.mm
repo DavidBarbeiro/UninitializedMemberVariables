@@ -3,27 +3,27 @@
 @implementation XYZPerson
 
 - (void) method1init{
-	p2=nil
+	p1=nil
 }
 
-- (int )method2init 
+- (int )setupasd 
 {
 	
-    p1 = nil;
+    p2 = nil;
     
 }
 
 - (int& )method3init 
 {
 	
-    p1 = nil;
+    p3 = nil;
     
 }
 
 - (int** )method4init 
 {
 	
-    p1 = nil;
+    p4 = nil;
     
 }
 
@@ -40,7 +40,7 @@
 
 - (int** )method7init:(int* type1) arg1 {
 	
-    p1 = nil;
+    p7 = nil;
     
 }
 
