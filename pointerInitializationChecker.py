@@ -77,9 +77,13 @@ def walklevel(some_dir):
 	return paths
 
 def filterHeaderFiles(filename):
+	if filename.find("libs")>0:
+		return False
+
 	fileExtension = filterExtension(filename)
 	if(fileExtension == "h" or fileExtension == "hpp"):
-		return filename
+		return True
+	return False
 
 def filterImplementationFiles(filename):
 	fileExtension = filterExtension(filename)
