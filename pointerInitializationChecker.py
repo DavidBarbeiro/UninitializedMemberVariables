@@ -16,6 +16,10 @@ def processHeader(filename):
 	print "Parsing " + filename
 	content = readFile(filename)
 	content = removeComments(content)
+
+	if (content.find("@interface") == -1):
+		return
+
 	pointerDeclarationList = []
 	for match in re.findall("\n\s+\w+ *\*.*;", content):
 		matchList = re.findall("\w+", match)
