@@ -1,5 +1,6 @@
 import re
 import glob, os
+import sys
 
 results = []
 
@@ -101,8 +102,13 @@ def printResults():
 		print "Uninitialized pointer " + result[0] + " in file " + result[1]
 
 def main():
+	if(len(sys.argv) != 2):
+		print("usage: pointerInitialisation.py [Path of root]")
+		return
+
 	print "\n------Started execution------\n"
-	dir_path = os.path.dirname(os.path.realpath(__file__))
+
+	dir_path = os.path.dirname(os.path.realpath(sys.argv[1]))
 	paths = walklevel(dir_path)
 
 	for filename in paths:
